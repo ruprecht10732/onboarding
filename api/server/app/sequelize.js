@@ -22,6 +22,7 @@ const AvailabilityDaysModel = require("./models/AvailabilityDays.model.js");
 const AvailabilityHoursModel = require("./models/AvailabilityHours.model.js");
 const Login = require("./models/login.model.js");
 const InviteesModel = require("./models/Invitees.model");
+const SignRequestModel = require("./models/SignRequest.model.js");
 const UserBankDetailsModel = require("./models/UserBankDetails.model");
 const UserIdPathModel = require("./models/UserIdPath.model.js");
 const UserContractPathModel = require("./models/UserContractPath.model.js");
@@ -44,6 +45,9 @@ Login.belongsTo(UserModel, {
 
 InviteesModel.belongsTo(ManagerModel);
 InviteesModel.belongsTo(VestigingenModel);
+
+SignRequestModel.belongsTo(UserModel);
+UserModel.hasMany(SignRequestModel);
 
 UserIdPathModel.belongsTo(UserModel);
 UserModel.hasOne(UserIdPathModel);

@@ -1,4 +1,11 @@
-import { Button, Chip, Grid, makeStyles, Typography } from "@material-ui/core";
+import {
+  Button,
+  Chip,
+  Grid,
+  makeStyles,
+  Typography,
+  Hidden,
+} from "@material-ui/core";
 import { Field, Form, Formik } from "formik";
 import React, { useRef, useState } from "react";
 import Arbeidsovereenkomst from "./Arbeidsovereenkomst";
@@ -177,9 +184,11 @@ function Contract() {
 
   return (
     <Grid container>
-      <Backdrop className={classes.backdrop} open={!start}>
-        <LockIcon style={{ fontSize: 100 }} />
-      </Backdrop>
+      <Hidden smDown>
+        <Backdrop className={classes.backdrop} open={!start}>
+          <LockIcon style={{ fontSize: 100 }} />
+        </Backdrop>
+      </Hidden>
       <Grid item container xs={12} style={{ maxHeight: "100vh" }}>
         <Grid
           item

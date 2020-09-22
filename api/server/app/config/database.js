@@ -1,8 +1,7 @@
 const Sequelize = require("Sequelize");
-const mysql = require("mysql2");
 
 module.exports = db = new Sequelize("backstage", "robinDB", "S10732b54861!", {
-  host: "localhost",
+  host: "145.131.29.106",
   dialect: "mysql",
 
   pool: {

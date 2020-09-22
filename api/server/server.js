@@ -6,7 +6,6 @@ const morgan = require("morgan");
 const path = require("path");
 const cors = require("cors");
 const models = require("./app/sequelize.js");
-require("dotenv").config();
 
 const app = express();
 
@@ -52,10 +51,10 @@ require("./app/routes/invite.routes.js")(app);
 require("./app/routes/department.routes.js")(app);
 require("./app/routes/user.routes.js")(app);
 
-// set port, listen for requests
-const PORT = process.env.PORT || 5050;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+// // set port, listen for requests
+// const PORT = process.env.PORT || 5050;
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}.`);
+// });
 
-module.exports = application;
+module.exports = app;
