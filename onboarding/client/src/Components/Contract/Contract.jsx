@@ -5,6 +5,9 @@ import {
   makeStyles,
   Typography,
   Hidden,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
 } from "@material-ui/core";
 import { Field, Form, Formik } from "formik";
 import React, { useRef, useState } from "react";
@@ -18,14 +21,13 @@ import FingerprintIcon from "@material-ui/icons/Fingerprint";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
 import GpsFixedIcon from "@material-ui/icons/GpsFixed";
 import TodayIcon from "@material-ui/icons/Today";
-import DoneIcon from "@material-ui/icons/Done";
-import { Redirect, useParams } from "react-router-dom";
 import * as dayjs from "dayjs";
 import VerifiedUserIcon from "@material-ui/icons/VerifiedUser";
 import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import LockIcon from "@material-ui/icons/Lock";
-import { Waypoint } from "react-waypoint";
+import Lottie from "lottie-react";
+import complete from "../../Static/checkmark.json";
+import alertOctagon from "../../Static/alertOctagon.json";
+import unlockanimation from "../../Static/28063-lock.json";
 
 const useStyles = makeStyles((theme) => ({
   backdrop: {
@@ -95,12 +97,12 @@ const now = dayjs();
 function Contract() {
   const classes = useStyles();
   const [start, setStart] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [imageURL, setImageUrl] = useState(null);
   const [signed, setSigned] = useState(false);
   const [location, setLocation] = useState(false);
   const [gegevens, setGegevens] = useState(false);
   const [submitButton, setSubmitButton] = useState(false);
+  const [locked, setLocked] = useState(true);
 
   const [initialValues, setInitialValues] = useState({
     volledigeNaam: "",
@@ -109,15 +111,25 @@ function Contract() {
   });
 
   const [data, setData] = useState({
-    fullname: "",
+    fullname: "Jan Oost",
+    geboortedatum: "03-02-1989",
+    iban: "NL28RABO0330636855",
+    woonplaats: "Den Helder",
     datum: now.format("D MMMM YYYY"),
-    plaats: "",
+    straat: "Soembastraat",
+    huisnummer: "1",
+    toevoeging: "a",
+    postcode: "1782 SP",
+    plaats: "Leiden",
     latitude: "",
     longitude: "",
   });
 
   const handleStart = () => {
-    setStart(true);
+    setLocked(false);
+    setTimeout(() => {
+      setStart(true);
+    }, 1000);
   };
 
   const handleSubmit = (values, actions) => {
@@ -136,9 +148,12 @@ function Contract() {
       navigator.geolocation.getCurrentPosition(function (position) {
         console.log("Latitude is :", position.coords.latitude);
         console.log("Longitude is :", position.coords.longitude);
-        setData({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+        setData((prevData) => {
+          return {
+            ...prevData,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
         });
         setLocation(true);
       });
@@ -156,10 +171,22 @@ function Contract() {
     setImageUrl(sigCanvas.current.getTrimmedCanvas().toDataURL("image/png"));
     setSigned(true);
   };
+
+  const style = {
+    height: 25,
+  };
+
+  const styleAlert = {
+    height: 25,
+  };
+
+  const lockedStyle = {
+    width: 150,
+  };
   //    async function _submitForm(values, actions) {
   //      Axios({
   //        method: "PUT",
-  //        url: `http://localhost:5050/api/invite/${id}`,
+  //        url: ``https://api.thecallcompany.nl/api/invite/${id}`,
   //        data: {
   //          email: values.email,
   //          wachtwoord: values.wachtwoord,
@@ -186,7 +213,15 @@ function Contract() {
     <Grid container>
       <Hidden smDown>
         <Backdrop className={classes.backdrop} open={!start}>
-          <LockIcon style={{ fontSize: 100 }} />
+          {locked ? (
+            <Lottie
+              autoplay={false}
+              animationData={unlockanimation}
+              style={lockedStyle}
+            />
+          ) : (
+            <Lottie animationData={unlockanimation} style={lockedStyle} />
+          )}
         </Backdrop>
       </Hidden>
       <Grid item container xs={12} style={{ maxHeight: "100vh" }}>
@@ -299,7 +334,9 @@ function Contract() {
                       >
                         <Chip
                           variant="outlined"
-                          label="1: Bevestig handtekening*"
+                          label={
+                            signed ? "Bevestigd" : "1: Bevestig handtekening*"
+                          }
                           onClick={save}
                           style={{
                             border: "dotted 1px black",
@@ -308,7 +345,11 @@ function Contract() {
                           disabled={signed ? true : false}
                           icon={
                             signed ? (
-                              <DoneIcon style={{ color: "green" }} />
+                              <Lottie
+                                animationData={complete}
+                                loop={false}
+                                style={style}
+                              />
                             ) : (
                               <VerifiedUserIcon />
                             )
@@ -318,7 +359,9 @@ function Contract() {
                           component="button"
                           type="submit"
                           variant="outlined"
-                          label="2: Bevestig gegevens*"
+                          label={
+                            gegevens ? "Bevestigd" : "2: Bevestig gegevens*"
+                          }
                           style={{
                             border: "dotted 1px black",
                             marginBottom: "3%",
@@ -328,7 +371,11 @@ function Contract() {
                           disabled={gegevens ? true : signed ? false : true}
                           icon={
                             gegevens ? (
-                              <DoneIcon style={{ color: "green" }} />
+                              <Lottie
+                                animationData={complete}
+                                loop={false}
+                                style={style}
+                              />
                             ) : (
                               <LocationOnIcon />
                             )
@@ -336,7 +383,9 @@ function Contract() {
                         />
                         <Chip
                           variant="outlined"
-                          label="3: Bevestig locatie*"
+                          label={
+                            location ? "Bevestigd" : "3: Bevestig locatie*"
+                          }
                           onClick={handleLocation}
                           style={{
                             border: "dotted 1px black",
@@ -346,7 +395,11 @@ function Contract() {
                           disabled={location ? true : gegevens ? false : true}
                           icon={
                             location ? (
-                              <DoneIcon style={{ color: "green" }} />
+                              <Lottie
+                                animationData={complete}
+                                loop={false}
+                                style={style}
+                              />
                             ) : (
                               <GpsFixedIcon />
                             )
@@ -426,9 +479,22 @@ function Contract() {
                         {location && (
                           <Grid item xs={12}>
                             {!submitButton ? (
-                              <Typography variant="subtitle2" color="error">
-                                Lees eerst het gehele document
-                              </Typography>
+                              <ListItem style={{ marginLeft: "-3%" }}>
+                                <ListItemIcon>
+                                  <Lottie
+                                    animationData={alertOctagon}
+                                    style={styleAlert}
+                                  />
+                                </ListItemIcon>
+                                <ListItemText
+                                  disableTypography={true}
+                                  style={{ marginLeft: "-3%" }}
+                                >
+                                  <Typography variant="subtitle2" color="error">
+                                    Lees eerst het gehele document
+                                  </Typography>
+                                </ListItemText>
+                              </ListItem>
                             ) : null}
                             <Button
                               type="submit"
@@ -467,10 +533,6 @@ function Contract() {
                 data={data}
                 setSubmitButton={setSubmitButton}
               />
-            </Route>
-
-            <Route exact path="/overeenkomst/integriteitsverklaring">
-              <Arbeidsovereenkomst imageURL={imageURL} />
             </Route>
           </Switch>
         </Grid>

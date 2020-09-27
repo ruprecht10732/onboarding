@@ -3,13 +3,12 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { Field } from "formik";
 import { TextField } from "formik-material-ui";
-import PaymentIcon from "@material-ui/icons/Payment";
 
 export default function BetalingGegevens() {
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
-        <PaymentIcon /> Betalinggegevens
+        Betalinggegevens
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={12}>

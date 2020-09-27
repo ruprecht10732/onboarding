@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { KeyboardDatePicker } from "formik-material-ui-pickers";
@@ -9,7 +9,9 @@ import FormControl from "@material-ui/core/FormControl";
 import { makeStyles } from "@material-ui/core";
 import MenuItem from "@material-ui/core/MenuItem";
 import { Select } from "formik-material-ui";
-import PersonPinIcon from "@material-ui/icons/PersonPin";
+import { subYears } from "date-fns";
+import Nationaliteiten from "../FormModel/nationaliteiten";
+import uuid from "react-uuid";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -33,19 +35,24 @@ export default function PersoonlijkeGegevens(props) {
     },
   } = props;
 
-  const today = new Date();
-  const maxDate =
-    today.getFullYear() -
-    18 +
-    "-" +
-    (today.getMonth() + 1) +
-    "-" +
-    today.getDate();
+  let today = new Date();
+  const maxDate = subYears(today, 18);
+  const nationaliteitenLijst = Nationaliteiten;
+
+  const lijst = useMemo(
+    () =>
+      nationaliteitenLijst.map((nationaliteit) => (
+        <MenuItem key={uuid()} value={nationaliteit.nationaliteit}>
+          {nationaliteit.nationaliteit}
+        </MenuItem>
+      )),
+    [nationaliteitenLijst]
+  );
 
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
-        <PersonPinIcon /> Persoonlijke gegevens
+        Persoonlijke gegevens
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -61,9 +68,15 @@ export default function PersoonlijkeGegevens(props) {
               }}
               autoFocus={true}
             >
-              <MenuItem value={"man"}>Man</MenuItem>
-              <MenuItem value={"vrouw"}>Vrouw</MenuItem>
-              <MenuItem value={"overige"}>Overige</MenuItem>
+              <MenuItem key="man" value={"Man"}>
+                Man
+              </MenuItem>
+              <MenuItem key="vrouw" value={"Vrouw"}>
+                Vrouw
+              </MenuItem>
+              <MenuItem key="overige" value={"Overige"}>
+                Overige
+              </MenuItem>
             </Field>
           </FormControl>
         </Grid>
@@ -85,7 +98,7 @@ export default function PersoonlijkeGegevens(props) {
             name={achternaam.name}
           />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6}>
           <Field
             component={KeyboardDatePicker}
             label={geboortedatum.label}
@@ -95,23 +108,31 @@ export default function PersoonlijkeGegevens(props) {
             maxDate={maxDate}
             maxDateMessage="Je moet ouder zijn dan 18 jaar om je te kunnen registreren"
             minDateMessage="Helaas, er is iets misgegaan, je mag al lang met pensioen"
-            invalidDateMessage="Dit is geen gelidige invoer. Voorbeeld: 01/01/2002"
+            invalidDateMessage="Dit is geen geldige invoer. Voorbeeld: 01/01/2002"
             openTo="year"
             format="dd-MM-yyyy"
             views={["year", "month", "date"]}
             fullWidth={true}
-            required
             autoOk={true}
+            required
           />
         </Grid>
-        <Grid item xs={6}>
-          <Field
-            fullWidth={true}
-            required
-            component={TextField}
-            label={nationaliteit.label}
-            name={nationaliteit.name}
-          />
+        <Grid item xs={12} sm={6}>
+          <FormControl required className={classes.formControl}>
+            <InputLabel htmlFor="nationaliteit-native-simple">
+              {nationaliteit.label}
+            </InputLabel>
+            <Field
+              component={Select}
+              name={nationaliteit.name}
+              inputProps={{
+                id: "nationaliteit-native-simple",
+              }}
+              autoFocus={true}
+            >
+              {lijst}
+            </Field>
+          </FormControl>
         </Grid>
         <Grid item xs={12}>
           <Field

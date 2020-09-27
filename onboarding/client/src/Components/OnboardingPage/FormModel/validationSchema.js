@@ -16,8 +16,6 @@ const {
     type,
     documentnummer,
     bsn,
-    idvoorkant,
-    idachterkant,
     noodContactNaam,
     noodContactAchternaam,
     noodContactTelefoon,
@@ -30,6 +28,7 @@ const bsnRegEx = /^\d{9}$/;
 const ibanRegEx = /^[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{4}[0-9]{7}([a-zA-Z0-9]?){0,16}$/;
 const geenCijfersRegEx = /^([^0-9]*)$/;
 const documentNummerRegEx = /^[A-NP-Za-np-z]{2}[0-9A-NP-Za-np-z]{6}[0-9]{1}$/;
+const postcodeRegEx = /^[1-9][0-9]{3}[\s]?[A-Za-z]{2}$/;
 
 export default [
   Yup.object().shape({
@@ -55,10 +54,6 @@ export default [
       .matches(geenCijfersRegEx, "Je mag geen cijfers gebruiken"),
     [telefoon.name]: Yup.string()
       .required(`${telefoon.requiredErrorMsg}`)
-      .matches(
-        "^(((\\+31|0|0031)6){1}[1-9]{1}[0-9]{7})$",
-        "Dit is geen geldig telefoonnummer"
-      )
       .max(10, "Maximaal 10 cijfers")
       .min(10, "Minimaal 10 cijfers"),
   }),
@@ -74,7 +69,8 @@ export default [
     [postcode.name]: Yup.string()
       .required(`${postcode.requiredErrorMsg}`)
       .min(6, "Dit veld moet minimaal 6 karakters bevatten")
-      .max(7, "Dit veld mag maximaal 7 karakters bevatten"),
+      .max(7, "Dit veld mag maximaal 7 karakters bevatten")
+      .matches(postcodeRegEx, "Dit is geen geldige postcode"),
     [woonplaats.name]: Yup.string()
       .required(`${woonplaats.requiredErrorMsg}`)
       .min(2, "Minimaal 2 karakters"),
@@ -86,16 +82,13 @@ export default [
       .max(9, "Maximaal 9 karakters")
       .min(9, "Minimaal 9 karakters")
       .matches(documentNummerRegEx, {
-        message: "Dit is geen geldig documentnummer",
+        message:
+          "Dit is geen geldig documentnummer. Let op: De letter 'O' komt in de documentnummers nooit voor. Reden hiervoor is om verwarring te voorkomen met het cijfer '0'. Alleen het cijfer komt dus voor.",
         excludeEmptyString: true,
       }),
     [bsn.name]: Yup.string()
       .required(`${bsn.requiredErrorMsg}`)
       .matches(bsnRegEx, "Dit is geen geldig burger service nummer"),
-    [idvoorkant.name]: Yup.string().required(`${idvoorkant.requiredErrorMsg}`),
-    [idachterkant.name]: Yup.string().required(
-      `${idachterkant.requiredErrorMsg}`
-    ),
   }),
   Yup.object().shape({
     [noodContactNaam.name]: Yup.string()

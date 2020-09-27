@@ -1,6 +1,5 @@
-import { Grid, makeStyles, Paper, Typography } from "@material-ui/core";
-import Axios from "axios";
-import React, { useRef } from "react";
+import { Grid, Typography } from "@material-ui/core";
+import React from "react";
 import { Waypoint } from "react-waypoint";
 import HandtekeningJasperBos from "./static/handtekening_jasper_bos.png";
 
@@ -31,8 +30,10 @@ function Arbeidsovereenkomst({ imageURL, data, setSubmitButton }) {
             verder te noemen: de werkgever. en
           </li>
           <li>
-            De heer (naam) wonende te (postcode) Leiden aan (adres), Nederland,
-            geboren op (geboortedatum), verder te noemen: de werknemer.
+            De heer {data.fullname} wonende te {data.postcode},{" "}
+            {data.woonplaats} aan{" "}
+            {`${data.straat} ${data.huisnummer}${data.toevoeging}`} , Nederland,
+            geboren op {data.geboortedatum}, verder te noemen: de werknemer.
           </li>
         </ol>
         <p>
@@ -493,11 +494,18 @@ function Arbeidsovereenkomst({ imageURL, data, setSubmitButton }) {
         <p>
           <strong>Contractuele gegevens</strong>
         </p>
-        <p>Loonheffingskorting (afhankelijk van formulier)</p>
-        <p>Geboortedatum (geboortedatum medewerker)</p>
-        <p>IBAN Nummer (IBAN medewerker)</p>
         <p>
-          Straatnaam, huisnummer, postcode &amp; woonplaat (Adres medewerker)
+          <em>Loonheffingskorting:</em> (afhankelijk van formulier)
+        </p>
+        <p>
+          <em>Geboortedatum:</em> {data.geboortedatum}
+        </p>
+        <p>
+          <em>IBAN Nummer:</em> {data.iban}
+        </p>
+        <p>
+          <em>Adres:</em>
+          {` ${data.straat} ${data.huisnummer}${data.toevoeging} ${data.postcode} ${data.woonplaats}`}
         </p>
       </Grid>
     </Grid>

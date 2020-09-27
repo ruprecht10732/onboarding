@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
-import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
 import { TextField } from "formik-material-ui";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import Box from "@material-ui/core/Box";
 import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import {
   CircularProgress,
   IconButton,
   InputAdornment,
+  Paper,
   Typography,
 } from "@material-ui/core";
 import { Field, Form, Formik } from "formik";
@@ -25,6 +22,9 @@ import * as Yup from "yup";
 import { Redirect, useParams } from "react-router-dom";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
+import Lottie from "lottie-react";
+import sendanimation from "../../Static/31085-sending-email.json";
+import sadanimation from "../../Static/872-empty-list.json";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -34,7 +34,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://www.thecalcompany.nl">
+      <Link color="inherit" href="https://www.thecallcompany.nl">
         The Call Company
       </Link>{" "}
       {new Date().getFullYear()}
@@ -44,18 +44,6 @@ function Copyright() {
 }
 
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  title: {
-    marginBottom: theme.spacing(2),
-  },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
     color: "#fff",
@@ -63,6 +51,12 @@ const useStyles = makeStyles((theme) => ({
   },
   buttonProgress: {
     color: "white",
+  },
+  main: {
+    background: "#708090",
+    margin: 0,
+    padding: 0,
+    minHeight: "100vh",
   },
 }));
 
@@ -84,9 +78,9 @@ export default function SignIn() {
     key: "",
     wachtwoord: "",
   });
-  const [visible, setVisible] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [values, setValues] = React.useState({
+  const [visible, setVisible] = useState(false); //change back to false
+  const [loading, setLoading] = useState(true); // change back to true
+  const [waarden, setValues] = React.useState({
     showPassword: false,
   });
   const [open, setOpen] = React.useState(false);
@@ -103,7 +97,7 @@ export default function SignIn() {
   };
 
   const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword });
+    setValues({ ...waarden, showPassword: !waarden.showPassword });
   };
 
   const handleMouseDownPassword = (event) => {
@@ -113,19 +107,21 @@ export default function SignIn() {
   async function _submitForm(values, actions) {
     Axios({
       method: "PUT",
-      url: `http://localhost:5050/api/invite/${id}`,
+      url: `https://api.thecallcompany.nl/api/invite/${id}`,
       data: {
         email: values.email,
         wachtwoord: values.wachtwoord,
       },
     })
-      .then((response) => {
-        setOpen(true);
-        setDisabled(true);
-        setTimeout(() => {
-          setSuccess(true);
-          actions.setSubmitting(false);
-        }, 2000);
+      .then((result) => {
+        if (result) {
+          setOpen(true);
+          setDisabled(true);
+          setTimeout(() => {
+            setSuccess(true);
+            actions.setSubmitting(false);
+          }, 2000);
+        }
       })
       .catch((error) => {
         actions.setSubmitting(false);
@@ -137,7 +133,7 @@ export default function SignIn() {
   }
 
   useEffect(() => {
-    const url = `http://localhost:5050/api/invite/${id}`;
+    const url = `https://api.thecallcompany.nl/api/invite/${id}`;
     Axios.get(url)
       .then((result) => {
         if (result.data.length > 0) {
@@ -159,125 +155,153 @@ export default function SignIn() {
           wachtwoord: "",
         });
       });
-  }, [id, loading]);
+  }, [id]);
 
   return (
-    <Container component="main" maxWidth="xs">
-      {succes ? <Redirect to="/login" /> : false}
-      <CssBaseline />
-      <div>
+    <div className={classes.main}>
+      <Grid
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
+        style={{ minHeight: "70vh" }}
+      >
+        {succes ? <Redirect to="/login" /> : false}
         <Backdrop className={classes.backdrop} open={loading}>
           <CircularProgress color="inherit" />
         </Backdrop>
-      </div>
-      <Snackbar open={open} autoHideDuration={6000}>
-        <Alert onClose={handleClose} severity={exist ? "error" : "success"}>
-          {exist
-            ? "Gebruiker bestaat al, vraag je manager om hulp"
-            : "Wachtwoord aangemaakt!"}
-        </Alert>
-      </Snackbar>
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography className={classes.title} component="h1" variant="h5">
-          {visible ? "Verifieer account" : "Deze uitnodiging is verlopen"}
-        </Typography>
-        <Typography className={classes.title} variant="body2">
-          {visible
-            ? `Je hebt een uitnodiging ontvangen vanuit The Call Company, zodra je op
+        <Snackbar open={open} autoHideDuration={6000}>
+          <Alert onClose={handleClose} severity={exist ? "error" : "success"}>
+            {exist
+              ? "Gebruiker bestaat al, vraag je manager om hulp"
+              : "Wachtwoord aangemaakt!"}
+          </Alert>
+        </Snackbar>
+        <Grid item container xs={11} sm={4} justify="center">
+          <Grid item>
+            {visible ? (
+              <Lottie
+                animationData={sendanimation}
+                style={{ maxWidth: "150px" }}
+              />
+            ) : (
+              <Lottie animationData={sadanimation} />
+            )}
+          </Grid>
+          <Paper style={{ padding: "3%" }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={12}>
+                <Grid item xs={12}>
+                  <Typography component="h1" variant="subtitle1">
+                    {visible
+                      ? "Verifieer account"
+                      : "Deze uitnodiging is verlopen"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" style={{ color: "gray" }}>
+                    {visible
+                      ? `Je hebt een uitnodiging ontvangen vanuit The Call Company, zodra je op
           "BEVESTIGEN" hebt geklikt, kun je je account gaan aanmaken. Zorg dat
           je je bankpas en identificatie bij de hand hebt.`
-            : "Jouw uitnodiging is verlopen, vraag je manager een nieuwe uitnodiging te versturen"}
-        </Typography>
-        {visible && (
-          <Formik
-            enableReinitialize={true}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={_submitForm}
-          >
-            {({ isSubmitting }) => (
-              <Form>
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <Field
-                      fullWidth={true}
-                      required
-                      component={TextField}
-                      name="email"
-                      disabled
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Field
-                      fullWidth={true}
-                      required
-                      component={TextField}
-                      name="key"
-                      disabled
-                    />
-                  </Grid>
-                  {visible && (
-                    <Grid item xs={12}>
-                      <Field
-                        fullWidth={true}
-                        required
-                        disabled={disabled ? true : false}
-                        component={TextField}
-                        label="Verzin een sterk wachtwoord"
-                        name="wachtwoord"
-                        type={values.showPassword ? "text" : "password"}
-                        variant="filled"
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={handleClickShowPassword}
-                                onMouseDown={handleMouseDownPassword}
-                              >
-                                {values.showPassword ? (
-                                  <Visibility />
-                                ) : (
-                                  <VisibilityOff />
-                                )}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                  )}
-                  <Grid item xs={12}>
-                    <Button
-                      startIcon={
-                        isSubmitting && (
-                          <CircularProgress
-                            size={24}
-                            className={classes.buttonProgress}
-                          />
-                        )
-                      }
-                      endIcon={<CheckIcon />}
-                      color="primary"
-                      type="submit"
-                      variant="contained"
-                      disabled={disabled ? true : false}
-                    >
-                      Bevestigen
-                    </Button>
-                  </Grid>
+                      : "Jouw uitnodiging is verlopen, vraag je manager een nieuwe uitnodiging te versturen"}
+                  </Typography>
                 </Grid>
-              </Form>
-            )}
-          </Formik>
-        )}
-      </div>
+                {visible && (
+                  <Formik
+                    enableReinitialize={true}
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={_submitForm}
+                  >
+                    {({ isSubmitting, values }) => (
+                      <Form>
+                        <Grid container spacing={3}>
+                          <Grid item xs={12}>
+                            <Field
+                              fullWidth={true}
+                              required
+                              component={TextField}
+                              name="email"
+                              label="Bevestig jouw e-mailadres"
+                              disabled
+                              InputProps={{ autoFocus: true }}
+                            />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Field
+                              fullWidth={true}
+                              required
+                              component={TextField}
+                              name="key"
+                              label="Persoonlijke code"
+                              disabled
+                            />
+                          </Grid>
+                          {visible && (
+                            <Grid item xs={12}>
+                              <Field
+                                fullWidth={true}
+                                required
+                                disabled={disabled ? true : false}
+                                component={TextField}
+                                label="Verzin een sterk wachtwoord"
+                                name="wachtwoord"
+                                type={
+                                  waarden.showPassword ? "text" : "password"
+                                }
+                                variant="filled"
+                                InputProps={{
+                                  endAdornment: (
+                                    <InputAdornment position="end">
+                                      <IconButton
+                                        aria-label="toggle password visibility"
+                                        onClick={handleClickShowPassword}
+                                        onMouseDown={handleMouseDownPassword}
+                                      >
+                                        {waarden.showPassword ? (
+                                          <Visibility />
+                                        ) : (
+                                          <VisibilityOff />
+                                        )}
+                                      </IconButton>
+                                    </InputAdornment>
+                                  ),
+                                }}
+                              />
+                            </Grid>
+                          )}
+                          <Grid
+                            item
+                            container
+                            xs={12}
+                            alignItems="flex-start"
+                            justify="center"
+                            direction="row"
+                          >
+                            <Button
+                              endIcon={<CheckIcon />}
+                              color="primary"
+                              type="submit"
+                              variant="contained"
+                              disabled={disabled ? true : false}
+                            >
+                              Bevestigen
+                            </Button>
+                          </Grid>
+                        </Grid>
+                      </Form>
+                    )}
+                  </Formik>
+                )}
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
       <Box mt={8}>
         <Copyright />
       </Box>
-    </Container>
+    </div>
   );
 }

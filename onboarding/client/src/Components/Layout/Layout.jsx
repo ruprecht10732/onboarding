@@ -1,37 +1,51 @@
-import React from "react";
-import { Switch, Route } from "react-router-dom";
+import React, { useState } from "react";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import nlLocale from "date-fns/locale/nl";
 import DateFnsUtils from "@date-io/date-fns";
 import { CssBaseline } from "@material-ui/core";
-
 import Form from "../OnboardingPage/Form";
 import Confirm from "../Confirm/Confirm";
 import Login from "../Login/Login";
-import Contract from "../Contract/Contract";
+import SignRequest from "../Contract/SignRequest";
+import NotFound from "../NotFound/NotFound";
+import ProtectedRoute from "../../services/protectedRoute";
 
-function Layout(props) {
+function Layout() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const logout = () => {
+    localStorage.removeItem("user");
+    setIsAuthenticated(false);
+  };
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils} locale={nlLocale}>
       <CssBaseline />
       <Switch>
         <Route exact path="/">
-          <Confirm />
+          <Login setIsAuthenticated={setIsAuthenticated} />
         </Route>
-        <Route exact path="/invite">
-          <Confirm />
+        <Route exact path="/login">
+          <Login setIsAuthenticated={setIsAuthenticated} />
         </Route>
         <Route exact path="/invite/:id">
           <Confirm />
         </Route>
-        <Route exact path="/login">
-          <Login />
-        </Route>
-        <Route exact path="/gegevens-aanleveren">
-          <Form />
-        </Route>
+        <ProtectedRoute
+          isAuthenticated={isAuthenticated}
+          path="/gegevens-aanleveren/:id"
+          logout={logout}
+          component={Form}
+        />
         <Route path="/ondertekenen">
-          <Contract />
+          <SignRequest />
+        </Route>
+        <Route path="/404">
+          <NotFound />
+        </Route>
+        <Route exact path="*">
+          <NotFound />
+          <Redirect from="*" to="/404" />
         </Route>
       </Switch>
     </MuiPickersUtilsProvider>

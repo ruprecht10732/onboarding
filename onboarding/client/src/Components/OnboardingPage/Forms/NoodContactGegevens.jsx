@@ -3,13 +3,12 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { Field } from "formik";
 import { TextField } from "formik-material-ui";
-import LocalHospitalIcon from "@material-ui/icons/LocalHospital";
 
 export default function AdresGegevens() {
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
-        <LocalHospitalIcon /> Noodcontact persoon
+        Noodcontact persoon
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>

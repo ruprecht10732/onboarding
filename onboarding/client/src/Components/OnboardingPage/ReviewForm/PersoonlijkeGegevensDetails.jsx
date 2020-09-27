@@ -56,7 +56,7 @@ export default function PersoonlijkeGegevensDetails(props) {
           </Grid>
           <Grid item xs={6}>
             <Typography gutterBottom>
-              {dayjs(geboortedatum).format("DD-MM-yyyy")}
+              {dayjs(geboortedatum).format("DD-MM-YYYY")}
             </Typography>
           </Grid>
         </React.Fragment>

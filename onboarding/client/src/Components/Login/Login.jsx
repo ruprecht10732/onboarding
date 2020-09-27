@@ -1,30 +1,30 @@
-import React, { useState } from "react";
-import Avatar from "@material-ui/core/Avatar";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { TextField } from "formik-material-ui";
-import Link from "@material-ui/core/Link";
-import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
-import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import {
+  Backdrop,
+  Box,
+  Button,
   CircularProgress,
+  Grid,
   IconButton,
   InputAdornment,
+  makeStyles,
+  Paper,
+  Snackbar,
   Typography,
 } from "@material-ui/core";
 import { Field, Form, Formik } from "formik";
-import CheckIcon from "@material-ui/icons/Check";
+import { TextField } from "formik-material-ui";
+import Lottie from "lottie-react";
+import React, { useState } from "react";
 import Axios from "axios";
-import Backdrop from "@material-ui/core/Backdrop";
+import * as Yup from "yup";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import * as Yup from "yup";
-import { Redirect, useParams } from "react-router-dom";
-import Snackbar from "@material-ui/core/Snackbar";
+import CheckIcon from "@material-ui/icons/Check";
+import inviteanimation from "../../Static/31185-email-sent.json";
+import Link from "@material-ui/core/Link";
 import MuiAlert from "@material-ui/lab/Alert";
+import { Redirect } from "react-router-dom";
+import authService from "../../services/auth.service";
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -34,7 +34,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://www.thecalcompany.nl">
+      <Link color="inherit" href="https://www.thecallcompany.nl">
         The Call Company
       </Link>{" "}
       {new Date().getFullYear()}
@@ -43,19 +43,12 @@ function Copyright() {
   );
 }
 
+const validationSchema = Yup.object({
+  email: Yup.string().required("Dit is een verplicht veld"),
+  wachtwoord: Yup.string().required("Dit is een verplicht veld"),
+});
+
 const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  title: {
-    marginBottom: theme.spacing(2),
-  },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
     color: "#fff",
@@ -64,33 +57,31 @@ const useStyles = makeStyles((theme) => ({
   buttonProgress: {
     color: "white",
   },
+  main: {
+    background: "#708090",
+    margin: 0,
+    padding: 0,
+    minHeight: "100vh",
+  },
 }));
 
-const validationSchema = Yup.object({
-  wachtwoord: Yup.string()
-    .required("Dit is een verplicht veld")
-    .min(10, "Je moet minimaal 10 tekens gebruiken")
-    .matches(
-      "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})",
-      "Het wachtwoord moet minimaal 1 hoofdletter bevatten, 1 kleine letter, 1 nummer en 1 speciaal karakter zoals: !@#$%^&*"
-    ),
-});
-
-export default function Login() {
-  let { id } = useParams();
+function Login({ setIsAuthenticated }) {
   const classes = useStyles();
-  const [initialValues, setInitialValues] = useState({
-    email: "",
-    key: "",
-    wachtwoord: "",
-  });
   const [loading, setLoading] = useState(false);
-  const [values, setValues] = React.useState({
+  const [open, setOpen] = React.useState(false);
+  const [loggedin, setLoggedIn] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [currentUser, setCurrentUser] = useState(false);
+
+  const [waarden, setValues] = React.useState({
     showPassword: false,
   });
-  const [open, setOpen] = React.useState(false);
-  const [disabled, setDisabled] = useState(false);
-  const [succes, setSuccess] = useState(false);
+
+  const [initialValues, setInitialValues] = useState({
+    email: "",
+    wachtwoord: "",
+  });
 
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -101,7 +92,7 @@ export default function Login() {
   };
 
   const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword });
+    setValues({ ...waarden, showPassword: !waarden.showPassword });
   };
 
   const handleMouseDownPassword = (event) => {
@@ -110,124 +101,161 @@ export default function Login() {
 
   async function _submitForm(values, actions) {
     Axios({
-      method: "PUT",
-      url: `http://localhost:5050/api/invite/${id}`,
+      method: "POST",
+      url: "`https://api.thecallcompany.nl/api/user/login",
       data: {
         email: values.email,
         wachtwoord: values.wachtwoord,
       },
     })
       .then((response) => {
+        localStorage.setItem("user", JSON.stringify(response.data));
+        setCurrentUser(authService.getCurrentUser());
+        setLoggedIn(false);
         setOpen(true);
+        setIsAuthenticated(true);
         setDisabled(true);
+        setLoading(true);
         setTimeout(() => {
-          setLoading(true);
-          setSuccess(true);
           actions.setSubmitting(false);
-        }, 2000);
+          actions.resetForm();
+          setLoading(false);
+          setDisabled(false);
+          setSuccess(true);
+        }, 1500);
       })
       .catch((error) => {
+        setLoading(false);
+        setInitialValues({
+          email: "",
+          wachtwoord: "",
+        });
         actions.setSubmitting(false);
+        setLoggedIn(true);
         setOpen(true);
-        setDisabled(true);
-        console.log(error);
       });
   }
 
   return (
-    <Container component="main" maxWidth="xs">
-      {succes ? <Redirect to="/gegevens-aanleveren" /> : false}
-      <CssBaseline />
-      <div>
+    <div className={classes.main}>
+      {success && <Redirect to={`/gegevens-aanleveren/${currentUser.id}`} />}
+      <Grid
+        container
+        direction="row"
+        justify="center"
+        alignItems="center"
+        style={{ minHeight: "80vh" }}
+      >
         <Backdrop className={classes.backdrop} open={loading}>
           <CircularProgress color="inherit" />
         </Backdrop>
-      </div>
-      <Snackbar open={open} autoHideDuration={6000}>
-        <Alert onClose={handleClose} severity="success">
-          Ingelogd
-        </Alert>
-      </Snackbar>
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography className={classes.title} component="h1" variant="h5">
-          Gegevens aanleveren
-        </Typography>
-        <Formik
-          enableReinitialize={true}
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={_submitForm}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Field
-                    fullWidth={true}
-                    required
-                    component={TextField}
-                    name="email"
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Field
-                    fullWidth={true}
-                    required
-                    disabled={disabled ? true : false}
-                    component={TextField}
-                    label="Verzin een sterk wachtwoord"
-                    name="wachtwoord"
-                    type={values.showPassword ? "text" : "password"}
-                    variant="filled"
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
+        <Snackbar open={open} autoHideDuration={6000}>
+          <Alert
+            onClose={handleClose}
+            severity={loggedin ? "error" : "success"}
+          >
+            {loggedin ? "E-mailadres of wachtwoord is incorrect" : "Ingelogd!"}
+          </Alert>
+        </Snackbar>
+        <Grid item container xs={11} sm={4} justify="center">
+          <Grid item>
+            <Lottie animationData={inviteanimation} />
+          </Grid>
+          <Paper style={{ padding: "3%" }}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={12}>
+                <Formik
+                  enableReinitialize={true}
+                  initialValues={initialValues}
+                  validationSchema={validationSchema}
+                  onSubmit={_submitForm}
+                >
+                  {({ isSubmitting, values }) => (
+                    <Form>
+                      <Grid container spacing={3}>
+                        <Grid item xs={12}>
+                          <Typography
+                            variant="subtitle2"
+                            style={{ color: "gray" }}
                           >
-                            {values.showPassword ? (
-                              <Visibility />
-                            ) : (
-                              <VisibilityOff />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    startIcon={
-                      isSubmitting && (
-                        <CircularProgress
-                          size={24}
-                          className={classes.buttonProgress}
-                        />
-                      )
-                    }
-                    endIcon={<CheckIcon />}
-                    color="primary"
-                    type="submit"
-                    variant="contained"
-                    disabled={disabled ? true : false}
-                  >
-                    Login
-                  </Button>
-                </Grid>
+                            Voer je e-mailadres en wachtwoord in om in te loggen
+                            en de aanmeld procedure te starten. Je kunt dit
+                            tussentijds niet opslaan, zorg dat je je
+                            bankgegevens en identificatie (geen rijbewijs) bij
+                            de hand hebt.
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Field
+                            fullWidth={true}
+                            required
+                            component={TextField}
+                            name="email"
+                            label="E-mailadres"
+                            InputProps={{ autoFocus: true }}
+                          />
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <Field
+                            fullWidth={true}
+                            required
+                            component={TextField}
+                            label="Jouw wachtwoord"
+                            name="wachtwoord"
+                            type={waarden.showPassword ? "text" : "password"}
+                            variant="filled"
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowPassword}
+                                    onMouseDown={handleMouseDownPassword}
+                                  >
+                                    {waarden.showPassword ? (
+                                      <Visibility />
+                                    ) : (
+                                      <VisibilityOff />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </Grid>
+                        <Grid
+                          item
+                          container
+                          xs={12}
+                          alignItems="flex-start"
+                          justify="center"
+                          direction="row"
+                        >
+                          <Button
+                            endIcon={<CheckIcon />}
+                            color="primary"
+                            type="submit"
+                            variant="contained"
+                            disabled={disabled}
+                          >
+                            Inloggen
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    </Form>
+                  )}
+                </Formik>
               </Grid>
-            </Form>
-          )}
-        </Formik>
-      </div>
+            </Grid>
+          </Paper>
+        </Grid>
+      </Grid>
       <Box mt={8}>
         <Copyright />
       </Box>
-    </Container>
+    </div>
   );
 }
+
+export default Login;

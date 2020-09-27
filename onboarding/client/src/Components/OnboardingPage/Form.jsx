@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Footer from "./Footer/Footer";
 import Axios from "axios";
-
+import Lottie from "lottie-react";
+import useranimation from "../../Static/3619-profile.json";
 import {
   Stepper,
   Step,
@@ -11,10 +12,9 @@ import {
   CircularProgress,
   Paper,
   Hidden,
+  Grid,
 } from "@material-ui/core";
-
 import { Formik, Form } from "formik";
-
 import AdresGegevens from "./Forms/AdresGegevens";
 import PersoonlijkeGegevens from "./Forms/PersoonlijkeGegevens";
 import IdentiteitGegevens from "./Forms/IdentiteitGegevens";
@@ -22,10 +22,11 @@ import NoodContactGegevens from "./Forms/NoodContactGegevens";
 import BetalingGegevens from "./Forms/BetalingGegevens";
 import FormReview from "./ReviewForm/FormReview";
 import FormSucces from "./FormSuccess/FormSucces";
-
 import validationSchema from "./FormModel/validationSchema";
 import checkoutFormModel from "./FormModel/checkoutFormModel";
 import formInitialValues from "./FormModel/formInitialValues";
+import authService from "../../services/auth.service";
+import { withRouter } from "react-router-dom";
 
 const steps = [
   "Persoonlijk",
@@ -38,6 +39,10 @@ const steps = [
 const { formId, formField } = checkoutFormModel;
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    background: "#708090",
+    minHeight: "100vh",
+  },
   layout: {
     width: "auto",
     marginLeft: theme.spacing(2),
@@ -46,6 +51,7 @@ const useStyles = makeStyles((theme) => ({
       width: 800,
       marginLeft: "auto",
       marginRight: "auto",
+      background: "#708090",
     },
   },
   paper: {
@@ -71,6 +77,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const style = {
+  height: 100,
+};
+
 function _renderStepContent(step) {
   switch (step) {
     case 0:
@@ -90,18 +100,19 @@ function _renderStepContent(step) {
   }
 }
 
-export default function FormStepper() {
+function FormStepper({ logout, ...rest }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const currentValidationSchema = validationSchema[activeStep];
   const isLastStep = activeStep === steps.length - 1;
+  const currentUser = authService.getCurrentUser();
+  console.log(currentUser);
 
   async function _submitForm(values, actions) {
     Axios({
       method: "POST",
-      url: "http://localhost:5050/api/user",
+      url: `https://api.thecallcompany.nl/api/user/${currentUser.id}`,
       data: {
-        email: values.email,
         geslacht: values.geslacht,
         naam: values.naam,
         achternaam: values.achternaam,
@@ -124,6 +135,7 @@ export default function FormStepper() {
         postcode: values.postcode,
         woonplaats: values.woonplaats,
       },
+      headers: { Authorization: `Bearer ${currentUser.token}` },
     })
       .then((response) => {
         actions.setSubmitting(false);
@@ -151,9 +163,10 @@ export default function FormStepper() {
   }
 
   return (
-    <React.Fragment>
+    <Grid container className={classes.root}>
       <main className={classes.layout}>
         <Paper className={classes.paper}>
+          <Lottie animationData={useranimation} style={style} />
           <Hidden smDown>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map((label) => (
@@ -176,7 +189,6 @@ export default function FormStepper() {
                 {({ isSubmitting }) => (
                   <Form id={formId}>
                     {_renderStepContent(activeStep)}
-
                     <div className={classes.buttons}>
                       {activeStep !== 0 && (
                         <Button
@@ -211,6 +223,7 @@ export default function FormStepper() {
         </Paper>
         <Footer />
       </main>
-    </React.Fragment>
+    </Grid>
   );
 }
+export default withRouter(FormStepper);

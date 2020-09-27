@@ -8,8 +8,6 @@ import { TextField } from "formik-material-ui";
 import MenuItem from "@material-ui/core/MenuItem";
 import { Select } from "formik-material-ui";
 import FormControl from "@material-ui/core/FormControl";
-import { SimpleFileUpload } from "formik-material-ui";
-import RecentActorsIcon from "@material-ui/icons/RecentActors";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -26,7 +24,7 @@ export default function IdentiteitGegevens() {
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
-        <RecentActorsIcon /> Identiteitsgegevens
+        Identiteitsgegevens
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12}>
@@ -63,24 +61,6 @@ export default function IdentiteitGegevens() {
             component={TextField}
             label="Burger Service Nummer"
             name="bsn"
-          />
-        </Grid>
-        <Grid item xs={12} sm={12}>
-          <Field
-            required
-            fullWidth={true}
-            component={SimpleFileUpload}
-            name="idvoorkant"
-            label="Kopie ID kaart (voorkant)"
-          />
-        </Grid>
-        <Grid item xs={12} sm={12}>
-          <Field
-            required
-            fullWidth={true}
-            component={SimpleFileUpload}
-            name="idachterkant"
-            label="Kopie ID kaart (achterkant)"
           />
         </Grid>
       </Grid>
