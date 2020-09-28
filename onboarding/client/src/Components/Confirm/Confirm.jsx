@@ -173,7 +173,7 @@ export default function SignIn() {
         <Snackbar open={open} autoHideDuration={6000}>
           <Alert onClose={handleClose} severity={exist ? "error" : "success"}>
             {exist
-              ? "Gebruiker bestaat al, vraag je manager om hulp"
+              ? `Gebruiker bestaat al, <a href="/login">login</a> met de bij jou bekende gegevens of vraag je manager om hulp`
               : "Wachtwoord aangemaakt!"}
           </Alert>
         </Snackbar>
@@ -204,7 +204,7 @@ export default function SignIn() {
                       ? `Je hebt een uitnodiging ontvangen vanuit The Call Company, zodra je op
           "BEVESTIGEN" hebt geklikt, kun je je account gaan aanmaken. Zorg dat
           je je bankpas en identificatie bij de hand hebt.`
-                      : "Jouw uitnodiging is verlopen, vraag je manager een nieuwe uitnodiging te versturen"}
+                      : `Jouw uitnodiging is verlopen, vraag je manager een nieuwe uitnodiging te versturen. <p><a href="/login">Uitnodiging al gebruikt maar nog niet je profiel aangemaakt? Log dan in om het procs te hervatten.</a></p>`}
                   </Typography>
                 </Grid>
                 {visible && (

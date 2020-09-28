@@ -105,8 +105,7 @@ function FormStepper({ logout, ...rest }) {
   const [activeStep, setActiveStep] = useState(0);
   const currentValidationSchema = validationSchema[activeStep];
   const isLastStep = activeStep === steps.length - 1;
-  const currentUser = authService.getCurrentUser();
-  console.log(currentUser);
+  const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
 
   async function _submitForm(values, actions) {
     Axios({
@@ -138,6 +137,7 @@ function FormStepper({ logout, ...rest }) {
       headers: { Authorization: `Bearer ${currentUser.token}` },
     })
       .then((response) => {
+        console.log(response.data);
         actions.setSubmitting(false);
         actions.resetForm();
         setActiveStep(activeStep + 1);

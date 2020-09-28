@@ -72,7 +72,7 @@ function Login({ setIsAuthenticated }) {
   const [loggedin, setLoggedIn] = useState(false);
   const [disabled, setDisabled] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [currentUser, setCurrentUser] = useState(false);
+  const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
 
   const [waarden, setValues] = React.useState({
     showPassword: false,
@@ -102,27 +102,30 @@ function Login({ setIsAuthenticated }) {
   async function _submitForm(values, actions) {
     Axios({
       method: "POST",
-      url: "`https://api.thecallcompany.nl/api/user/login",
+      url: "https://api.thecallcompany.nl/api/user/login",
       data: {
         email: values.email,
         wachtwoord: values.wachtwoord,
       },
     })
       .then((response) => {
-        localStorage.setItem("user", JSON.stringify(response.data));
-        setCurrentUser(authService.getCurrentUser());
-        setLoggedIn(false);
-        setOpen(true);
-        setIsAuthenticated(true);
-        setDisabled(true);
-        setLoading(true);
-        setTimeout(() => {
-          actions.setSubmitting(false);
-          actions.resetForm();
-          setLoading(false);
-          setDisabled(false);
-          setSuccess(true);
-        }, 1500);
+        if (response.data) {
+          console.log(response.data);
+          localStorage.setItem("user", JSON.stringify(response.data));
+          setCurrentUser(authService.getCurrentUser());
+          setLoggedIn(false);
+          setOpen(true);
+          setIsAuthenticated(true);
+          setDisabled(true);
+          setLoading(true);
+          setTimeout(() => {
+            actions.setSubmitting(false);
+            actions.resetForm();
+            setLoading(false);
+            setDisabled(false);
+            setSuccess(true);
+          }, 1500);
+        }
       })
       .catch((error) => {
         setLoading(false);
