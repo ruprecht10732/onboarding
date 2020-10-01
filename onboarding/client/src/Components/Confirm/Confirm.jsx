@@ -172,9 +172,14 @@ export default function SignIn() {
         </Backdrop>
         <Snackbar open={open} autoHideDuration={6000}>
           <Alert onClose={handleClose} severity={exist ? "error" : "success"}>
-            {exist
-              ? `Gebruiker bestaat al, <a href="/login">login</a> met de bij jou bekende gegevens of vraag je manager om hulp`
-              : "Wachtwoord aangemaakt!"}
+            {exist ? (
+              <Link href="/login">
+                Gebruiker bestaat al, <em>login</em> met de bij jou bekende
+                gegevens of vraag je manager om hulp.
+              </Link>
+            ) : (
+              "Wachtwoord aangemaakt!"
+            )}
           </Alert>
         </Snackbar>
         <Grid item container xs={11} sm={4} justify="center">
@@ -200,11 +205,24 @@ export default function SignIn() {
                 </Grid>
                 <Grid item xs={12}>
                   <Typography variant="subtitle2" style={{ color: "gray" }}>
-                    {visible
-                      ? `Je hebt een uitnodiging ontvangen vanuit The Call Company, zodra je op
+                    {visible ? (
+                      `Je hebt een uitnodiging ontvangen vanuit The Call Company, zodra je op
           "BEVESTIGEN" hebt geklikt, kun je je account gaan aanmaken. Zorg dat
           je je bankpas en identificatie bij de hand hebt.`
-                      : `Jouw uitnodiging is verlopen, vraag je manager een nieuwe uitnodiging te versturen. <p><a href="/login">Uitnodiging al gebruikt maar nog niet je profiel aangemaakt? Log dan in om het procs te hervatten.</a></p>`}
+                    ) : (
+                      <>
+                        <p>
+                          Jouw uitnodiging is verlopen, vraag je manager een
+                          nieuwe uitnodiging te versturen.
+                        </p>
+                        <Link href="/login">
+                          <p>
+                            Uitnodiging al gebruikt maar nog niet je profiel
+                            aangemaakt? Log dan in om het proces te hervatten.
+                          </p>
+                        </Link>
+                      </>
+                    )}
                   </Typography>
                 </Grid>
                 {visible && (

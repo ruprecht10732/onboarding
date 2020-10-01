@@ -64,7 +64,7 @@ function SignRequest() {
   });
 
   useEffect(() => {
-    const url = `https://api.thecallcompany.nl/api/invite/${id}`;
+    const url = `https://api.thecallcompany.nl/api/signdocument/${id}`;
     Axios.get(url)
       .then((result) => {
         if (result.data.length > 0) {
