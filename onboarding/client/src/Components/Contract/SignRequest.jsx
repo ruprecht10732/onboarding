@@ -86,31 +86,6 @@ function SignRequest() {
       });
   }, [id, loading]);
 
-  //    async function _submitForm(values, actions) {
-  //      Axios({
-  //        method: "PUT",
-  //        url: ``https://api.thecallcompany.nl/api/invite/${id}`,
-  //        data: {
-  //          email: values.email,
-  //          wachtwoord: values.wachtwoord,
-  //        },
-  //      })
-  //        .then((response) => {
-  //          setOpen(true);
-  //          setDisabled(true);
-  //          setTimeout(() => {
-  //            setLoading(true);
-  //            setSuccess(true);
-  //            actions.setSubmitting(false);
-  //          }, 2000);
-  //        })
-  //        .catch((error) => {
-  //          actions.setSubmitting(false);
-  //          setOpen(true);
-  //          setDisabled(true);
-  //          console.log(error);
-  //        });
-  //    }
 
   return (
     <div className={classes.main}>
