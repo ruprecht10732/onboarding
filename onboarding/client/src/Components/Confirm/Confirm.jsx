@@ -217,7 +217,7 @@ export default function SignIn() {
                         </p>
                         <Link href="/login">
                           <p>
-                            Uitnodiging al gebruikt maar nog niet je profiel
+                            Uitnodiging al gebruikt maar profiel nog niet
                             aangemaakt? Log dan in om het proces te hervatten.
                           </p>
                         </Link>
